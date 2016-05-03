@@ -32,14 +32,22 @@ public final class Program {
         //启动线程，开始异步操作
         m_javathread.start();
 
+
+
         //等待线程退出标识
         while (javathread.b_Exit) {
 
             //同时还可以做其它事情
             System.out.print("Program is Running!\n");
 
-            //这里休眠一下
-            Thread.sleep(1000);
+            //这里休眠一下的话要出错，
+           //Thread.sleep(1000);
+
+            //等线程运行函数退出
+            synchronized (javathread.obj) {
+
+                javathread.obj.wait();
+            }
         }
 
         //退出进程

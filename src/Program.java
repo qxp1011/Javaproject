@@ -7,7 +7,10 @@ import com.xm.SocketIO.nettyserver;
 import com.xm.buffer.javabuffer;
 import com.xm.control.javacontrol;
 import com.xm.db.javadb;
+import com.xm.thread.consumerthread;
 import com.xm.thread.javathread;
+import com.xm.thread.producerthread;
+import com.xm.thread.userthread;
 
 public final class Program {
 
@@ -25,6 +28,18 @@ public final class Program {
         nettyserver m_nettyserver = new nettyserver();
         javabuffer m_javabuffer = new javabuffer();
         javadb m_javadb = new javadb();
+
+
+        userthread UserThread=new userthread();
+
+        Thread pThread=new Thread(new producerthread(UserThread));
+        Thread cThread=new Thread(new consumerthread(UserThread));
+
+
+        pThread.start();
+        cThread.start();
+
+
 
         //调用线程类的内部函数
         m_javathread.Test();

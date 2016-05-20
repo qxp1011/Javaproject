@@ -25,6 +25,7 @@ public class producerthread implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             UserThread.setproduct(p);
 
         }

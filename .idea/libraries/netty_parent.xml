@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="netty-parent">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/netty-parent.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

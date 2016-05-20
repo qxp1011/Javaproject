@@ -20,6 +20,7 @@ public class consumerthread implements Runnable {
 
         for(int p=1;p<=10;p++) {
 
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

@@ -40,6 +40,10 @@ public final class Program {
         cThread.start();
 
 
+        //等这两个线程执行完比再执行后面的代码
+        pThread.join();
+        cThread.join();
+
 
         //调用线程类的内部函数
         m_javathread.Test();
@@ -58,12 +62,31 @@ public final class Program {
             //这里休眠一下的话要出错，
            //Thread.sleep(1000);
 
+            //注：javathread这个线程的运行很有意思，其run函数并不是执行一次就退出，主线程虽然在wait状态，但不保证它能竞争过子线程立即得到执行
+
+
             //等线程运行函数退出
             synchronized (javathread.obj) {
 
                 javathread.obj.wait();
             }
         }
+
+
+
+
+         //强制退出线程
+        if(m_javathread!=null ) {
+
+           // pThread.interrupt();
+            m_javathread.StopNonRunThread();
+        }
+
+
+        //等待线程结束
+        m_javathread.join();
+
+
 
         //退出进程
         System.out.print("Program Exit!\n");

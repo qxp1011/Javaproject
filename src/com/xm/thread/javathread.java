@@ -12,36 +12,75 @@ public class javathread extends Thread    {
     public final  static Object obj=new Object();
 
 
+
+    private volatile Thread blinker;
+
+
+
     //线程类的内部普通函数
     public void Test(){
 
         System.out.print("javathread.Test is running!\n");
 
     }
+    //http://docs.oracle.com/javase/1.5.0/docs/guide/misc/threadPrimitiveDeprecation.html
+    //此文中建议用此方法创建和结束线程
+    public void start()
+    {
+        blinker=new Thread(this);
+        blinker.start();
+    }
+
 
     //继承Thread类之后必须实现的函数
     public void run()
     {
-        try {
+        Thread thisThread=Thread.currentThread();
+        while (blinker==thisThread) {
 
-            synchronized (obj ) {
-                System.out.print("javathread.run is running!\n");
+            try {
 
-                //休眠10秒
-                Thread.sleep(3000);
+                synchronized (obj) {
+                    System.out.print("javathread.run is running!\n");
 
-                //本线程退出了
-                b_Exit = false;
+                    //休眠10秒
+                    Thread.sleep(3000);
 
-                //线程通知
-                obj.notifyAll();
+                    //本线程退出了
+                    b_Exit = false;
 
-                System.out.print("Thread is Exit!\n");
+                    //线程通知
+                    obj.notifyAll();
 
-            }
+                    System.out.print("Thread is Exit!\n");
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Interrupted",e);
+
+        }
+        }
+
+    }
+
+
+    //退出正在运行的线程
+    public  void StopRunThread()
+    {
+        blinker=null;
+    }
+
+
+    //退出可能阻塞的线程
+    public void StopNonRunThread()
+    {
+        Thread tmpblinker=blinker;
+        blinker=null;
+        if(tmpblinker!=null)
+        {
+            tmpblinker.interrupt();
         }
 
     }

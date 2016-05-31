@@ -5,10 +5,7 @@ package com.xm.SocketIO;
  */
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoop;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -40,62 +37,64 @@ public class TcpServer {
 
     private static final EventLoopGroup workGroup = new NioEventLoopGroup(BIZTHREADSIZE);
 
+
     protected static void run() throws Exception {
-        ServerBootstrap b = new ServerBootstrap();
 
-        b.group(bossGroup, workGroup);
+        try {
 
-        b.channel(NioServerSocketChannel.class);
+            ServerBootstrap b = new ServerBootstrap();
 
-        b.childHandler(new ChannelInitializer<SocketChannel>() {
+            b.group(bossGroup, workGroup);
 
-                           @Override
-                           protected void initChannel(SocketChannel socketChannel) throws Exception {
-                               ChannelPipeline pipeline = socketChannel.pipeline();
-                             //  pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-                            //   pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
-                             //  pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
-                             //  pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-                               pipeline.addLast(new TcpServerHandler());
+            b.channel(NioServerSocketChannel.class);
+
+            b.childHandler(new ChannelInitializer<SocketChannel>() {
+
+                               @Override
+                               protected void initChannel(SocketChannel socketChannel) throws Exception {
+                                   ChannelPipeline pipeline = socketChannel.pipeline();
+                                   //  pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                                   //   pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
+                                   //  pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
+                                   //  pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
+                                   pipeline.addLast(new TcpServerHandler());
+                               }
                            }
-                       }
-        );
+            );
 
-        b.bind(IP, PORT).sync();
+            ChannelFuture f = b.bind(IP, PORT).sync();
+            f.channel().closeFuture().sync();
+        }
+        finally {
+            shutdown();
+        }
 
     }
 
 
     protected static void shutdown() {
-        workGroup.shutdownGracefully();
-        bossGroup.shutdownGracefully();
+
+        if(workGroup!=null) {
+            workGroup.shutdownGracefully();
+        }
+
+        if(bossGroup!=null) {
+            bossGroup.shutdownGracefully();
+        }
     }
 
 
     public static void main(String[] args) throws Exception {
 
-
         try {
+
             TcpServer.run();
-        } finally {
-          //  TcpServer.shutdown();
+
+        } catch(Exception ex) {
+
+            throw new Exception(ex);
         }
 
-
-/*
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            ((ServerBootstrap)((ServerBootstrap)b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)).handler(new LoggingHandler(LogLevel.INFO))).childHandler(new SocksServerInitializer());
-            b.bind(PORT).sync().channel().closeFuture().sync();
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
-    */
     }
 
 }

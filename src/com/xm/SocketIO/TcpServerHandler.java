@@ -22,28 +22,35 @@ import java.util.List;
 public class TcpServerHandler extends ChannelInboundHandlerAdapter {
 
 
+    //接收包计数器
     int icount=0;
 
     private void MsgProcess(ChannelHandlerContext ctx,ByteBuf byteBuf) throws Exception {
 
-        // byteBuf.toString();
-
+        //接收字节缓冲区
         byte [] bytes=new byte[byteBuf.readableBytes()];
 
+        //拷贝缓冲区数据
         byteBuf.readBytes(bytes);
 
+        //构造输出字符串
         String s=new String(bytes,"ASCII");
 
         System.out.println("Receive:"+icount++ +"  Len:"+ bytes.length+"  Msg:"+s+"\n");
 
+        //释放接收缓冲区
         byteBuf.release();
 
+        //构造回送字符串
         String response="Send Msg:"+icount+" "+s;
 
+        //构造回送缓冲区
         ByteBuf sendBuf=ctx.alloc().buffer(4 * response.length());
 
+        //将数据放入回送缓冲区
         sendBuf.writeBytes(response.getBytes());
 
+        //发送数据
         ctx.writeAndFlush(sendBuf);
     }
 

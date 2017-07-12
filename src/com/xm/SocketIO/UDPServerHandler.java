@@ -10,6 +10,13 @@ import io.netty.channel.socket.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
+
+
+
+
+//http://blog.csdn.net/kokjuis/article/details/72846388
+
+
 /**
  * Created by qxp on 2016/5/31.
  */
@@ -78,3 +85,4 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
 
 }
+

@@ -9,7 +9,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.example.socksproxy.SocksServerInitializer;
+//import io.netty.example.socksproxy.SocksServerInitializer;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
@@ -18,16 +18,23 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
 
+
 public class TcpServer {
 
     public TcpServer() {
 
     }
 
-    //TCP Server IP
-    private static final String IP = "127.0.0.1";
+    //TCP Server IP final意为只读
+    //private static final String IP = "127.0.0.1";
     //TCP Server PORT
-    private static final int PORT = 8888;
+    //private static final int PORT = 8888;
+
+
+    //TCP Server IP final意为只读
+    private static  String IP = "127.0.0.1";
+    //TCP Server PORT
+    private static  int PORT = 8888;
 
     //bossGroup任务个数
     protected static final int BIZGROUPSIZE = Runtime.getRuntime().availableProcessors() * 2;
@@ -49,6 +56,8 @@ public class TcpServer {
             //启动对象
             ServerBootstrap b = new ServerBootstrap();
 
+        //    Bootstrap b = new Bootstrap();
+
 //            http://stackoverflow.com/questions/28331809/netty-bootstrap-with-boss-group-or-with-just-with-workers-eventloopgroup
           //  The book and examples indicates that we should use the so-called boss group and the worker group when bootstraping the server:
            // serverBootstrap.group(bossGroup, workerGroup);
@@ -65,8 +74,9 @@ public class TcpServer {
             //注册工作任务
             b.group(bossGroup, workGroup);
 
-            //注册通道类型
+            //注册通道类型，NioServerSocketChannel指定为TCP Sever  NioDatagramChannel指定为UDP
             b.channel(NioServerSocketChannel.class);
+
 
             //注册Channel
             b.childHandler(new ChannelInitializer<SocketChannel>() {
@@ -78,6 +88,7 @@ public class TcpServer {
                                    //   pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
                                    //  pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
                                    //  pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
+                                  // pipeline.addLast(new TcpServerHandler());
                                    pipeline.addLast(new TcpServerHandler());
                                }
                            }
@@ -111,6 +122,13 @@ public class TcpServer {
     public static void main(String[] args) throws Exception {
 
         try {
+
+            if(args.length>1 && args[0]!=null && args[1]!=null)
+            {
+                IP=args[0];
+                PORT=Integer.parseInt(args[1]);
+            }
+
 
             TcpServer.run();
 
